@@ -122,6 +122,7 @@ FUNCTION(AddANHLibrary name)
             ${ANHLIB_DEPENDS}
             ${GTEST_BOTH_LIBRARIES}
             ${GMOCK_LIBRARY})
+        add_dependencies(${name}_tests DEPS)
                             
         IF(_project_deps_list_length GREATER 0)
             ADD_DEPENDENCIES(${name}_tests ${ANHLIB_DEPENDS})
