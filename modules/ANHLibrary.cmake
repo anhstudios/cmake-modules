@@ -9,8 +9,6 @@
 #     DEPENDS [ARGS] [args1...]           	     # Dependencies on other MMOServer projects
 #     ADDITIONAL_INCLUDE_DIRS [ARGS] [args1...]  # Additional directories to search for includes
 #     ADDITIONAL_SOURCE_DIRS [ARGS] [args1...]   # Additional directories to search for files to include in the project
-#     DEBUG_LIBRARIES [ARGS] [args1....]         # Additional debug libraries to link the project against
-#     OPTIMIZED_LIBRARIES [ARGS] [args1...])     # Additional optimized libraries to link the project against
 #
 #
 ########################
