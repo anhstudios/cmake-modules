@@ -162,5 +162,9 @@ FUNCTION(AddANHSharedLibrary name)
             ADD_TEST(NAME all_${name}_tests COMMAND ${name}_tests "--gtest_output=xml:${PROJECT_BINARY_DIR}/$<CONFIGURATION>/")
         ENDIF()
     ENDIF()
+	
+	IF (WIN32)
+		ADD_DEFINITIONS ( -DDLL_EXPORTS )
+	ENDIF()
         
 ENDFUNCTION()
