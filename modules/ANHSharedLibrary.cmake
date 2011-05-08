@@ -164,6 +164,8 @@ FUNCTION(AddANHSharedLibrary name)
     ENDIF()
 	
 	IF (WIN32)
+		# set the default output directory for the shared library for convenience
+		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
 		ADD_DEFINITIONS ( -DDLL_EXPORTS )
 	ENDIF()
         
