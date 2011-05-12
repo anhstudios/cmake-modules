@@ -3,6 +3,11 @@ set(ZLib_SOURCEDIR "${VENDOR_PREFIX}/src/ZLib")
 set(ZLib_INCLUDEDIR "${ZLib_SOURCEDIR}")
 set(ZLib_LIBRARYDIR "${ZLib_SOURCEDIR}")
 
+list(APPEND vendor_args
+	"-DZLib_INCLUDEDIR:PATH=${ZLib_INCLUDEDIR}")
+list(APPEND vendor_args
+	"-DZLib_LIBRARYDIR:PATH=${ZLib_LIBRARYDIR}")
+	
 if(WIN32)
 	set(patch_command del zconf.h)
 else()
