@@ -18,7 +18,7 @@ find_path(MYSQLCONNECTORCPP_DRIVER_INCLUDE_DIR mysql_driver.h
 
 find_library(MYSQLCONNECTORCPP_LIBRARY 
     NAMES mysqlcppconn
-    PATH_SUFFIXES lib driver driver/Debug driver/Release
+    PATH_SUFFIXES lib driver driver/Debug driver/Release lib/Debug lib/Release
     HINTS
         $ENV{MysqlConnectorCpp_ROOT}
         ${MysqlConnectorCpp_ROOT}

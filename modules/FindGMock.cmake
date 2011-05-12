@@ -9,7 +9,7 @@ find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
 
 find_library(GMOCK_LIBRARY 
     NAMES gmock
-    PATH_SUFFIXES lib Debug Release
+    PATH_SUFFIXES lib lib/Debug lib/Release Debug Release
     HINTS
         $ENV{GMock_ROOT}
         ${GMock_ROOT}

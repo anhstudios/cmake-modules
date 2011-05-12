@@ -2,6 +2,9 @@
 
 set(MysqlConnectorC_ROOT "${VENDOR_PREFIX}/src/MysqlConnectorC")
 
+list(APPEND vendor_args
+	"-DMysqlConnectorC_ROOT:PATH=${MysqlConnectorC_ROOT}")
+	
 ExternalProject_Add(MysqlConnectorC
 	PREFIX ${VENDOR_PREFIX}	
 	GIT_REPOSITORY https://github.com/anhstudios/mysql-connector-c.git

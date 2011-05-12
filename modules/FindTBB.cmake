@@ -155,7 +155,8 @@ mark_as_advanced(TBB_INCLUDE_DIR)
 if (NOT $ENV{TBB_ARCH_PLATFORM} STREQUAL "")
     set (_TBB_LIBRARY_DIR 
          ${_TBB_INSTALL_DIR}/lib/$ENV{TBB_ARCH_PLATFORM}
-         ${_TBB_INSTALL_DIR}/$ENV{TBB_ARCH_PLATFORM}/lib
+         ${_TBB_INSTALL_DIR}/$ENV{TBB_ARCH_PLATFORM}/lib  
+        ${_TBB_INSTALL_DIR}/lib/ia32/vc10
         ${_TBB_INSTALL_DIR}/build/vc10/ia32/Debug
         ${_TBB_INSTALL_DIR}/build/vc10/ia32/Release
         )
@@ -164,7 +165,8 @@ else (NOT $ENV{TBB_ARCH_PLATFORM} STREQUAL "")
     set (_TBB_LIBRARY_DIR 
         "${_TBB_INSTALL_DIR}/lib"      
         "${_TBB_INSTALL_DIR}/lib/gcc_debug"  
-        "${_TBB_INSTALL_DIR}/lib/gcc_release"     
+        "${_TBB_INSTALL_DIR}/lib/gcc_release"
+        ${_TBB_INSTALL_DIR}/lib/ia32/vc10
         ${_TBB_INSTALL_DIR}/build/vc10/ia32/Debug
         ${_TBB_INSTALL_DIR}/build/vc10/ia32/Release
     )

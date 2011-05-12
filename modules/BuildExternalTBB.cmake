@@ -1,6 +1,9 @@
 # Build the TBB vendor library
 set(TBB_ROOT "${VENDOR_PREFIX}/src/TBB")
 
+list(APPEND vendor_args
+	"-DTBB_INSTALL_DIR:PATH=${TBB_ROOT}")
+	
 if(WIN32)
 	set(tbb_build msbuild "${TBB_ROOT}/build/vc10/makefile.sln")
 else()
