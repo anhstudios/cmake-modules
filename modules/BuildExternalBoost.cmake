@@ -4,6 +4,13 @@ set(Boost_INCLUDEDIR "${Boost_SOURCEDIR}" CACHE PATH "" FORCE)
 set(Boost_LIBRARYDIR "${Boost_SOURCEDIR}/../Boost-build/lib" CACHE PATH "" FORCE)
 set(BoostShared_LIBRARYDIR "${Boost_SOURCEDIR}/../BoostShared-build/lib" CACHE PATH "" FORCE)
 
+list(APPEND vendor_args
+	"-DBOOST_INCLUDEDIR:PATH=${Boost_INCLUDEDIR}")
+list(APPEND vendor_args
+	"-DBOOST_LIBRARYDIR:PATH=${Boost_LIBRARYDIR}")
+list(APPEND vendor_args
+	"-DBoostShared_LIBRARYDIR:PATH=${BoostShared_LIBRARYDIR}")
+
 if(MSVC)
 	set(boost_lib_args
 		-DLIBPREFIX=lib

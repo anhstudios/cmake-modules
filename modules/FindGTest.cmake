@@ -117,6 +117,8 @@ endif()
 set(_gtest_libpath_suffixes lib)
 if(MSVC)
     list(APPEND _gtest_libpath_suffixes
+        lib/Debug
+        lib/Release
         Debug
         Release)
 endif()

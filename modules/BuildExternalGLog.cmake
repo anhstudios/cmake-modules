@@ -18,6 +18,11 @@ else()
     set(GLog_LIBRARYDIR "${GLog_SOURCEDIR}/lib")
 endif()
 
+list(APPEND vendor_args
+	"-DGLog_INCLUDEDIR:PATH=${GLog_INCLUDEDIR}")
+list(APPEND vendor_args
+	"-DGLog_LIBRARYDIR:PATH=${GLog_LIBRARYDIR}")
+	
 ExternalProject_Add(GLog
 	PREFIX ${VENDOR_PREFIX}
 	GIT_REPOSITORY https://github.com/anhstudios/glog.git
