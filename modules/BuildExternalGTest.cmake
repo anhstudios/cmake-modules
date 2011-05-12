@@ -3,6 +3,11 @@ set(GTest_SOURCEDIR "${VENDOR_PREFIX}/src/GTest")
 set(GTest_INCLUDEDIR "${GTest_SOURCEDIR}/include")
 set(GTest_LIBRARYDIR "${GTest_SOURCEDIR}")
 
+list(APPEND vendor_args
+	"-DGTest_INCLUDEDIR:PATH=${GTest_INCLUDEDIR}")
+list(APPEND vendor_args
+	"-DGTest_LIBRARYDIR:PATH=${GTest_LIBRARYDIR}")
+	
 if(MSVC)
 	set(gtest_lib_args
 		-Dgtest_force_shared_crt=ON

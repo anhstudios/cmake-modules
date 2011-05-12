@@ -1,6 +1,9 @@
 # Build the MysqlConnectorCpp vendor library
 set(MysqlConnectorCpp_ROOT "${VENDOR_PREFIX}/src/MysqlConnectorCpp")
 
+list(APPEND vendor_args
+	"-DMysqlConnectorCpp_ROOT:PATH=${MysqlConnectorCpp_ROOT}")
+	
 ExternalProject_Add(MysqlConnectorCpp
 	DEPENDS Boost MysqlConnectorC
 	PREFIX ${VENDOR_PREFIX}	
