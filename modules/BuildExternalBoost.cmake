@@ -45,9 +45,6 @@ ExternalProject_Add(Boost
     INSTALL_COMMAND ""
 )
 
-FIND_PACKAGE(PythonLibs REQUIRED)
-FIND_PACKAGE(PythonInterp REQUIRED)
-
 ExternalProject_Add(BoostShared
     DEPENDS Boost
 	PREFIX ${VENDOR_PREFIX}
