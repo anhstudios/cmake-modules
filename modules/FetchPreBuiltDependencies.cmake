@@ -2,7 +2,7 @@ list(APPEND vendor_libraries vendor)
 
 ExternalProject_Add(vendor
 	DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
-	URL http://localhost/swganh-deps-win.tar.gz
+	URL http://s3.amazonaws.com/github/downloads/anhstudios/swganh/swganh-deps-${bootstrap_VERSION_MAJOR}.${bootstrap_VERSION_MINOR}.${bootstrap_VERSION_PATCH}-win.tar.gz
 	URL_MD5 d51d4ebb6b9cb0b53b7e0351d2cc5161
 	SOURCE_DIR ${VENDOR_PREFIX}
 	UPDATE_COMMAND ""
