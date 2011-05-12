@@ -8,7 +8,7 @@ find_path(GLOG_INCLUDE_DIR glog/logging.h
 
 find_library(GLOG_LIBRARY 
     NAMES glog libglog
-    PATH_SUFFIXES Debug Release
+    PATH_SUFFIXES lib lib/Debug lib/Release Debug Release
     HINTS
         $ENV{GLog_ROOT}
         ${GLog_ROOT}

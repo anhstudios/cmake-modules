@@ -9,7 +9,7 @@ find_path(ZLIB_INCLUDE_DIR zlib.h
 
 find_library(ZLIB_LIBRARY 
     NAMES z zlib zlibd
-    PATH_SUFFIXES lib Debug Release
+    PATH_SUFFIXES lib Debug Release lib/Debug lib/Release
     HINTS
         $ENV{ZLib_ROOT}
         ${ZLib_ROOT}
