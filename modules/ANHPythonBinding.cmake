@@ -108,6 +108,22 @@ FUNCTION(AddANHPythonBinding name)
 		TARGET_LINK_LIBRARIES(${name} ${ANHPYTHONLIB_DEPENDS})
     ENDIF()
 
+    IF(_debug_list_length GREATER 0)
+        FOREACH(debug_library ${ANHPYTHONLIB_DEBUG_LIBRARIES})
+            if (NOT ${debug_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} debug ${debug_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
+    
+    IF(_optimized_list_length GREATER 0)
+        FOREACH(optimized_library ${ANHPYTHONLIB_OPTIMIZED_LIBRARIES})
+            if (NOT ${optimized_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} optimized ${optimized_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
+        
 	IF(WIN32)
 		# Set the default output directory for binaries for convenience.
 		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")

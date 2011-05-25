@@ -113,6 +113,22 @@ FUNCTION(AddANHSharedLibrary name)
         ADD_DEPENDENCIES(${name} ${ANHSHAREDLIB_DEPENDS})
 		TARGET_LINK_LIBRARIES(${name} ${ANHSHAREDLIB_DEPENDS})
     ENDIF()
+    
+    IF(_debug_list_length GREATER 0)
+        FOREACH(debug_library ${ANHSHAREDLIB_DEBUG_LIBRARIES})
+            if (NOT ${debug_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} debug ${debug_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
+    
+    IF(_optimized_list_length GREATER 0)
+        FOREACH(optimized_library ${ANHSHAREDLIB_OPTIMIZED_LIBRARIES})
+            if (NOT ${optimized_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} optimized ${optimized_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
 
 	IF(_tests_list_length GREATER 0)
         # Create an executable for the test and link it to gtest and anh
