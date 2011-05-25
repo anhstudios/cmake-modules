@@ -58,14 +58,14 @@
 INCLUDE(CMakeMacroParseArguments)
 
 FUNCTION(AddANHPythonBinding name)
-    PARSE_ARGUMENTS(ANHPYTHONLIB "DEPENDS;SOURCES;ADDITIONAL_LINK_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
+    PARSE_ARGUMENTS(ANHPYTHONLIB "DEPENDS;SOURCES;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
     
     LIST(LENGTH SOURCES __source_files_list_length)
     LIST(LENGTH ANHPYTHONLIB_DEBUG_LIBRARIES _debug_list_length)
     LIST(LENGTH ANHPYTHONLIB_OPTIMIZED_LIBRARIES _optimized_list_length)
     LIST(LENGTH ANHPYTHONLIB_DEPENDS _project_deps_list_length)
     LIST(LENGTH ANHPYTHONLIB_ADDITIONAL_INCLUDE_DIRS _includes_list_length)
-    LIST(LENGTH ANHPYTHONLIB_ADDITIONAL_LINK_DIRS _links_list_length)
+    LIST(LENGTH ANHPYTHONLIB_ADDITIONAL_LIBRARY_DIRS _librarydirs_list_length)
     LIST(LENGTH ANHPYTHONLIB_ADDITIONAL_SOURCE_DIRS _sources_list_length)
             
     # Grab all of the source files and all of the unit test files.
@@ -96,8 +96,8 @@ FUNCTION(AddANHPythonBinding name)
         INCLUDE_DIRECTORIES(${ANHPYTHONLIB_ADDITIONAL_INCLUDE_DIRS})
     ENDIF()
         
-    IF(_links_list_length GREATER 0)
-        LINK_DIRECTORIES(${ANHPYTHONLIB_ADDITIONAL_LINK_DIRS})
+    IF(_librarydirs_list_length GREATER 0)
+        LINK_DIRECTORIES(${ANHPYTHONLIB_ADDITIONAL_LIBRARY_DIRS})
     ENDIF()
 	    
     # Create the Common library
@@ -108,6 +108,22 @@ FUNCTION(AddANHPythonBinding name)
 		TARGET_LINK_LIBRARIES(${name} ${ANHPYTHONLIB_DEPENDS})
     ENDIF()
 
+    IF(_debug_list_length GREATER 0)
+        FOREACH(debug_library ${ANHPYTHONLIB_DEBUG_LIBRARIES})
+            if (NOT ${debug_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} debug ${debug_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
+    
+    IF(_optimized_list_length GREATER 0)
+        FOREACH(optimized_library ${ANHPYTHONLIB_OPTIMIZED_LIBRARIES})
+            if (NOT ${optimized_library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} optimized ${optimized_library})                    
+            endif()
+        ENDFOREACH()
+    ENDIF()
+        
 	IF(WIN32)
 		# Set the default output directory for binaries for convenience.
 		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
