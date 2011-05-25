@@ -32,6 +32,9 @@ FOREACH(_CURRENT_VERSION 3.1 3.2)
   IF(WIN32)
     FIND_LIBRARY(PYTHON_DEBUG_LIBRARY
       NAMES python${_CURRENT_VERSION_NO_DOTS}_d python
+      PATH_SUFFIXES lib
+      HINTS      
+        ${PYTHON_ROOT}
       PATHS
       [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/libs/Debug
       [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/libs )
@@ -39,18 +42,14 @@ FOREACH(_CURRENT_VERSION 3.1 3.2)
 
   FIND_LIBRARY(PYTHON_LIBRARY
     NAMES python${_CURRENT_VERSION_NO_DOTS} python${_CURRENT_VERSION}
+    # This is where the static library is usually located
+    PATH_SUFFIXES python${_CURRENT_VERSION}/config lib
+    HINTS      
+      ${PYTHON_ROOT}
     PATHS
       [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/libs
     # Avoid finding the .dll in the PATH.  We want the .lib.
     NO_SYSTEM_ENVIRONMENT_PATH
-  )
-  # Look for the static library in the Python config directory
-  FIND_LIBRARY(PYTHON_LIBRARY
-    NAMES python${_CURRENT_VERSION_NO_DOTS} python${_CURRENT_VERSION}
-    # Avoid finding the .dll in the PATH.  We want the .lib.
-    NO_SYSTEM_ENVIRONMENT_PATH
-    # This is where the static library is usually located
-    PATH_SUFFIXES python${_CURRENT_VERSION}/config
   )
 
   # For backward compatibility, honour value of PYTHON_INCLUDE_PATH, if 
@@ -70,11 +69,13 @@ FOREACH(_CURRENT_VERSION 3.1 3.2)
 
   FIND_PATH(PYTHON_INCLUDE_DIR
     NAMES Python.h
+    HINTS      
+        ${PYTHON_ROOT}
     PATHS
       ${PYTHON_FRAMEWORK_INCLUDES}
       [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/include
     PATH_SUFFIXES
-      python${_CURRENT_VERSION}
+      python${_CURRENT_VERSION} include
   )
 
   # For backward compatibility, set PYTHON_INCLUDE_PATH, but make it internal.

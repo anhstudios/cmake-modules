@@ -56,14 +56,14 @@
 INCLUDE(CMakeMacroParseArguments)
 
 FUNCTION(AddANHLibrary name)
-    PARSE_ARGUMENTS(ANHLIB "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LINK_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
+    PARSE_ARGUMENTS(ANHLIB "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LINK_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
     
     LIST(LENGTH SOURCES __source_files_list_length)
     LIST(LENGTH ANHLIB_DEBUG_LIBRARIES _debug_list_length)
     LIST(LENGTH ANHLIB_OPTIMIZED_LIBRARIES _optimized_list_length)
     LIST(LENGTH ANHLIB_DEPENDS _project_deps_list_length)
     LIST(LENGTH ANHLIB_ADDITIONAL_INCLUDE_DIRS _includes_list_length)
-    LIST(LENGTH ANHLIB_ADDITIONAL_LINK_DIRS _links_list_length)
+    LIST(LENGTH ANHLIB_ADDITIONAL_LIBRARY_DIRS _librarydirs_list_length)
     LIST(LENGTH ANHLIB_ADDITIONAL_SOURCE_DIRS _sources_list_length)
             
     # Grab all of the source files and all of the unit test files.
@@ -100,8 +100,8 @@ FUNCTION(AddANHLibrary name)
         INCLUDE_DIRECTORIES(${ANHLIB_ADDITIONAL_INCLUDE_DIRS})
     ENDIF()
         
-    IF(_links_list_length GREATER 0)
-        LINK_DIRECTORIES(${ANHLIB_ADDITIONAL_LINK_DIRS})
+    IF(_librarydirs_list_length GREATER 0)
+        LINK_DIRECTORIES(${ANHLIB_ADDITIONAL_LIBRARY_DIRS})
     ENDIF()
     
     # Create the Common library
@@ -114,12 +114,13 @@ FUNCTION(AddANHLibrary name)
     IF(_tests_list_length GREATER 0)
         # Create an executable for the test and link it to gtest and anh
         INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIR})
+    
         ADD_EXECUTABLE(${name}_tests ${TEST_SOURCES})
         TARGET_LINK_LIBRARIES(${name}_tests 
             ${name}
             ${ANHLIB_DEPENDS}
             ${GTEST_BOTH_LIBRARIES}
-            ${GMOCK_LIBRARY})
+            ${GMOCK_LIBRARIES})
         add_dependencies(${name}_tests DEPS)
                             
         IF(_project_deps_list_length GREATER 0)
@@ -145,10 +146,20 @@ FUNCTION(AddANHLibrary name)
         IF(WIN32)
             # Set the default output directory for binaries for convenience.
             SET_TARGET_PROPERTIES(${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
-                                     
-            # After each executable project is built make sure the environment is
-            # properly set up (scripts, default configs, etc exist).
-            #ADD_CUSTOM_COMMAND(TARGET ${name}_tests POST_BUILD
+               
+            # Mysql is built with the static runtime but all of our projects and deps
+            # use the dynamic runtime, in this instance it's a non-issue so ignore
+            # the problem lib.
+            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
+        
+            # Create a custom built user configuration so that the "run in debug mode"
+            # works without any issues.
+    	    CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../tools/windows/user_project.vcxproj.in 
+    	        ${CMAKE_CURRENT_BINARY_DIR}/${name}_tests.vcxproj.user @ONLY)
+    	                    
+    	    ## After each executable project is built make sure the environment is
+    	    ## properly set up (scripts, default configs, etc exist).
+    	    #ADD_CUSTOM_COMMAND(TARGET ${name}_tests POST_BUILD
             #    COMMAND call \"${PROJECT_BINARY_DIR}/bin/\$\(ConfigurationName\)/${name}_tests\"
             #) 
         ENDIF()

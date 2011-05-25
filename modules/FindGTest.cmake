@@ -15,7 +15,7 @@
 #
 # Accepts the following variables as input:
 #
-#   GTest_ROOT - (as a CMake or environment variable)
+#   GTEST_ROOT - (as a CMake or environment variable)
 #                The root directory of the gtest install prefix
 #
 #   GTEST_MSVC_SEARCH - If compiling with MSVC, this variable can be set to
@@ -100,9 +100,8 @@ function(_gtest_find_library _name)
     find_library(${_name}
         NAMES ${ARGN}
         HINTS
-            $ENV{GTest_ROOT}
-            ${GTest_ROOT}
-            ${GTest_LIBRARYDIR}
+            $ENV{GTEST_ROOT}
+            ${GTEST_ROOT}
         PATH_SUFFIXES ${_gtest_libpath_suffixes}
     )
     mark_as_advanced(${_name})
@@ -116,19 +115,21 @@ endif()
 
 set(_gtest_libpath_suffixes lib)
 if(MSVC)
-    list(APPEND _gtest_libpath_suffixes
-        lib/Debug
-        lib/Release
-        Debug
-        Release)
+    if(GTEST_MSVC_SEARCH STREQUAL "MD")
+        list(APPEND _gtest_libpath_suffixes
+            lib/Debug
+            lib/Release)
+    elseif(GTEST_MSVC_SEARCH STREQUAL "MT")
+        list(APPEND _gtest_libpath_suffixes
+            lib/Debug
+            lib/Release)
+    endif()
 endif()
-
 
 find_path(GTEST_INCLUDE_DIR gtest/gtest.h
     HINTS
-        $ENV{GTest_ROOT}/include
-        ${GTest_ROOT}/include
-        ${GTest_INCLUDEDIR}
+        $ENV{GTEST_ROOT}/include
+        ${GTEST_ROOT}/include
 )
 mark_as_advanced(GTEST_INCLUDE_DIR)
 

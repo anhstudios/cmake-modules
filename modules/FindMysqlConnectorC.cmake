@@ -1,24 +1,11 @@
 #   Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
 #
-#   The MySQL Connector/C++ is licensed under the terms of the GPLv2
+#   The MySQL Connector/C++ is licensed under the terms of the GPL
 #   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most
 #   MySQL Connectors. There are special exceptions to the terms and
-#   conditions of the GPLv2 as it is applied to this software, see the
+#   conditions of the GPL as it is applied to this software, see the
 #   FLOSS License Exception
 #   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
-#
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published
-#   by the Free Software Foundation; version 2 of the License.
-#
-#   This program is distributed in the hope that it will be useful, but
-#   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-#   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-#   for more details.
-#
-#   You should have received a copy of the GNU General Public License along
-#   with this program; if not, write to the Free Software Foundation, Inc.,
-#   51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
 ##########################################################################
 MACRO(_MYSQL_CONFIG VAR _regex _opt)
@@ -82,18 +69,19 @@ IF (WIN32)
 	# Set lib path suffixes
 	# dist = for mysql binary distributions
 	# build = for custom built tree
-	IF (CMAKE_BUILD_TYPE STREQUAL Release)
+	IF (CMAKE_BUILD_TYPE STREQUAL Debug)
+		SET(libsuffixDist debug)
+		SET(libsuffixBuild Debug)
+	ELSE (CMAKE_BUILD_TYPE STREQUAL Debug)
 		SET(libsuffixDist opt)
 		SET(libsuffixBuild Release)
 		ADD_DEFINITIONS(-DDBUG_OFF)
-	ELSE (CMAKE_BUILD_TYPE STREQUAL Release)
-		SET(libsuffixDist debug)
-		SET(libsuffixBuild Debug)
-	ENDIF (CMAKE_BUILD_TYPE STREQUAL Release)
-    message(${libsuffixBuild})
+	ENDIF (CMAKE_BUILD_TYPE STREQUAL Debug)
+
 	FIND_LIBRARY(MYSQL_LIB NAMES mysqlclient
 				 PATHS
 				 $ENV{MYSQL_DIR}/lib/${libsuffixDist}
+				 $ENV{MYSQL_DIR}/lib/${libsuffixBuild}
 				 $ENV{MYSQL_DIR}/lib 			#mysqlclient may be in lib for some c/c distros
 				 $ENV{MYSQL_DIR}/libmysql/${libsuffixBuild}
 				 $ENV{MYSQL_DIR}/client/${libsuffixBuild}
@@ -139,7 +127,6 @@ ELSE (WIN32)
 					 PATHS
 					 $ENV{MYSQL_DIR}/libmysql_r/.libs
 					 $ENV{MYSQL_DIR}/lib
-					 $ENV{MYSQL_DIR}/libmysql
 					 $ENV{MYSQL_DIR}/lib/mysql
 					 /usr/lib/mysql
 					 /usr/local/lib/mysql
@@ -151,7 +138,6 @@ ELSE (WIN32)
 		IF(MYSQL_LIB)
 			GET_FILENAME_COMPONENT(MYSQL_LIB_DIR ${MYSQL_LIB} PATH)
 			SET(MYSQLCPPCONN_DYNLOAD_MYSQL_LIB MYSQL_LIB)
-		  ADD_DEFINITIONS("-DDYNLOAD_MYSQL_LIB=\"${MYSQLCPPCONN_DYNLOAD_MYSQL_LIB}\"")
 		ENDIF(MYSQL_LIB)
 	ENDIF (MYSQL_CONFIG_EXECUTABLE)
 ENDIF (WIN32)
@@ -173,16 +159,16 @@ IF (MYSQL_INCLUDE_DIR AND MYSQL_LIB_DIR)
 			#SET(CMAKE_REQUIRED_LIBRARIES ${MYSQL_LIB})
 		ELSE(WIN32)
 			# For now this works only on *nix
-			#SET(CMAKE_REQUIRED_LIBRARIES ${MYSQL_LIBRARIES})
-			#SET(CMAKE_REQUIRED_INCLUDES ${MYSQL_INCLUDE_DIR})
-			#CHECK_FUNCTION_EXISTS("mysql_set_character_set" HAVE_SET_CHARSET)
-			#SET(CMAKE_REQUIRED_LIBRARIES)
-			#SET(CMAKE_REQUIRED_INCLUDES)
-			#IF (HAVE_SET_CHARSET)
-			#	MESSAGE(STATUS "libmysql version - ok")
-			#ELSE (HAVE_SET_CHARSET)
-			#	MESSAGE(FATAL_ERROR "Versions < 4.1.13 (for MySQL 4.1.x) and < 5.0.7 for (MySQL 5.0.x) are not supported. Please update your libraries.")
-			#ENDIF (HAVE_SET_CHARSET)
+			SET(CMAKE_REQUIRED_LIBRARIES ${MYSQL_LIBRARIES})
+			SET(CMAKE_REQUIRED_INCLUDES ${MYSQL_INCLUDE_DIR})
+			CHECK_FUNCTION_EXISTS("mysql_set_character_set" HAVE_SET_CHARSET)
+			SET(CMAKE_REQUIRED_LIBRARIES)
+			SET(CMAKE_REQUIRED_INCLUDES)
+			IF (HAVE_SET_CHARSET)
+				MESSAGE(STATUS "libmysql version - ok")
+			ELSE (HAVE_SET_CHARSET)
+				MESSAGE(FATAL_ERROR "Versions < 4.1.13 (for MySQL 4.1.x) and < 5.0.7 for (MySQL 5.0.x) are not supported. Please update your libraries.")
+			ENDIF (HAVE_SET_CHARSET)
 		ENDIF(WIN32)
 	ENDIF(MYSQL_VERSION)
 
