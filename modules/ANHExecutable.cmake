@@ -56,7 +56,7 @@ INCLUDE(CMakeMacroParseArguments)
 INCLUDE(ANHLibrary)
 
 FUNCTION(AddANHExecutable name)
-    PARSE_ARGUMENTS(ANHEXE "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LINK_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
+    PARSE_ARGUMENTS(ANHEXE "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
     
     # get information about the data passed in, helpful for checking if a value
     # has been set or not
@@ -64,7 +64,7 @@ FUNCTION(AddANHExecutable name)
     LIST(LENGTH ANHEXE_OPTIMIZED_LIBRARIES _optimized_list_length)
     LIST(LENGTH ANHEXE_DEPENDS _project_deps_list_length)
     LIST(LENGTH ANHEXE_ADDITIONAL_INCLUDE_DIRS _includes_list_length)
-	LIST(LENGTH ANHEXE_ADDITIONAL_LINK_DIRS _links_list_length)
+	LIST(LENGTH ANHEXE_ADDITIONAL_LIBRARY_DIRS _librarydirs_list_length)
     LIST(LENGTH ANHEXE_ADDITIONAL_SOURCE_DIRS _sources_list_length)
     
     # load up all of the source and header files for the project
@@ -112,26 +112,39 @@ FUNCTION(AddANHExecutable name)
     IF(_includes_list_length GREATER 0)
         INCLUDE_DIRECTORIES(${ANHEXE_ADDITIONAL_INCLUDE_DIRS})
     ENDIF()
-	IF(_links_list_length GREATER 0)
-        LINK_DIRECTORIES(${ANHEXE_ADDITIONAL_LINK_DIRS})
+    
+	IF(_librarydirs_list_length GREATER 0)
+        LINK_DIRECTORIES(${ANHEXE_ADDITIONAL_LIBRARY_DIRS})
     ENDIF()
     
-    # Set some default include directories for executables
-    INCLUDE_DIRECTORIES(${MYSQL_INCLUDE_DIR} ${MysqlConnectorCpp_INCLUDES})
-    
-    # Create the executable
+    # Create the executable and link to it's library
     ADD_EXECUTABLE(${name} ${SOURCES})
+    
+    # If a project library was created link to it
+    IF(DEFINED __project_library)
+        TARGET_LINK_LIBRARIES(${name}
+            ${__project_library}
+        )
+    ENDIF()
     
     IF(_project_deps_list_length GREATER 0)
         TARGET_LINK_LIBRARIES(${name} ${ANHEXE_DEPENDS})
     ENDIF()
     
-    IF(_debug_list_length GREATER 0)
-        TARGET_LINK_LIBRARIES(${name} debug ${ANHEXE_DEBUG_LIBRARIES})
+    IF(_debug_list_length GREATER 0)    
+        FOREACH(__library ${ANHEXE_DEBUG_LIBRARIES})
+            if (NOT ${__library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} debug ${__library})
+            endif()
+        ENDFOREACH()
     ENDIF()
     
     IF(_optimized_list_length GREATER 0)
-        TARGET_LINK_LIBRARIES(${name} optimized ${ANHEXE_OPTIMIZED_LIBRARIES})
+        FOREACH(__library ${ANHEXE_OPTIMIZED_LIBRARIES})
+            if (NOT ${__library} MATCHES ".*NOTFOUND")
+                TARGET_LINK_LIBRARIES(${name} optimized ${__library})
+            endif()
+        ENDFOREACH()
     ENDIF()
     
     IF(WIN32)
@@ -146,11 +159,10 @@ FUNCTION(AddANHExecutable name)
         # Link to some standard windows libs that all projects need.
     	TARGET_LINK_LIBRARIES(${name} "winmm.lib" "ws2_32.lib")
         
-    	# After each executable project is built make sure the environment is
-    	# properly set up (scripts, default configs, etc exist).
-    	# ADD_CUSTOM_COMMAND(TARGET ${name} POST_BUILD
-            # COMMAND call \"${PROJECT_SOURCE_DIR}/tools/windows/postbuild.bat\" \"${PROJECT_SOURCE_DIR}\" \"${PROJECT_BINARY_DIR}\" \"\$\(ConfigurationName\)\"
-        # )   
+        # Create a custom built user configuration so that the "run in debug mode"
+        # works without any issues.
+    	CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../tools/windows/user_project.vcxproj.in 
+    	    ${CMAKE_CURRENT_BINARY_DIR}/${name}.vcxproj.user @ONLY)
     ELSE()
         # On unix platforms put the built runtimes in the /bin directory.
         INSTALL(TARGETS ${name} RUNTIME DESTINATION bin)
