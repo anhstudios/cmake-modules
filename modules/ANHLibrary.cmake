@@ -70,6 +70,7 @@ FUNCTION(AddANHLibrary name)
     IF(__source_files_list_length EQUAL 0)    
         # load up all of the source and header files for the project
         FILE(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
+        FILE(GLOB_RECURSE HEADERS *.h)
         FILE(GLOB_RECURSE TEST_SOURCES *_unittest.cc *_unittest.cpp mock_*.h)
             
         FOREACH(__source_file ${SOURCES})
@@ -95,6 +96,11 @@ FUNCTION(AddANHLibrary name)
     IF(_tests_list_length GREATER 0)
         LIST(REMOVE_ITEM SOURCES ${TEST_SOURCES}) # Remove the unit tests from the sources list. 
     ENDIF()
+    
+    # get the number of .cc .cpp files
+    set(_tmp ${SOURCES})
+    LIST(REMOVE_ITEM _tmp ${HEADERS})
+    LIST(LENGTH _tmp _sources_list_length)
         
     IF(_includes_list_length GREATER 0)
         INCLUDE_DIRECTORIES(${ANHLIB_ADDITIONAL_INCLUDE_DIRS})
@@ -106,6 +112,7 @@ FUNCTION(AddANHLibrary name)
     
     # Create the Common library
     ADD_LIBRARY(${name} STATIC ${SOURCES})    
+	SET_TARGET_PROPERTIES(${name} PROPERTIES LINKER_LANGUAGE CXX)
     
     IF(_project_deps_list_length GREATER 0)
         ADD_DEPENDENCIES(${name} ${ANHLIB_DEPENDS})
@@ -116,8 +123,16 @@ FUNCTION(AddANHLibrary name)
         INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIR})
     
         ADD_EXECUTABLE(${name}_tests ${TEST_SOURCES})
+        
+        # only link to the library if their are sources (header only libs 
+        # don't generate binaries)
+        if(_sources_list_length GREATER 0)
+            TARGET_LINK_LIBRARIES(${name}_tests
+                ${name}
+            )
+        endif()
+        
         TARGET_LINK_LIBRARIES(${name}_tests 
-            ${name}
             ${ANHLIB_DEPENDS}
             ${GTEST_BOTH_LIBRARIES}
             ${GMOCK_LIBRARIES})
