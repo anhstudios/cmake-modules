@@ -69,6 +69,7 @@ FUNCTION(AddANHExecutable name)
     
     # load up all of the source and header files for the project
     FILE(GLOB_RECURSE SOURCES *.cc *.cpp *.h)   
+    FILE(GLOB_RECURSE HEADERS *.h)
     FILE(GLOB_RECURSE TEST_SOURCES *_unittest.cc *_unittest.cpp mock_*.h)
         
     FOREACH(__source_file ${SOURCES})
@@ -96,6 +97,8 @@ FUNCTION(AddANHExecutable name)
                 ${ANHEXE_DEPENDS}
             SOURCES
                 ${SOURCES}
+            HEADERS
+                ${HEADERS}
             TEST_SOURCES
                 ${TEST_SOURCES}
             ADDITIONAL_INCLUDE_DIRS
