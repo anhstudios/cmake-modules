@@ -190,6 +190,11 @@ FUNCTION(AddANHSharedLibrary name)
     ENDIF()
 	
 	IF (WIN32)
+        # Mysql is built with the static runtime but all of our projects and deps
+        # use the dynamic runtime, in this instance it's a non-issue so ignore
+        # the problem lib.
+        SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
+        
 		# set the default output directory for the shared library for convenience
 		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
 		ADD_DEFINITIONS ( -DDLL_EXPORTS )
