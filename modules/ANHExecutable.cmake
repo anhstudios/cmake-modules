@@ -91,6 +91,8 @@ FUNCTION(AddANHExecutable name)
     LIST(LENGTH TEST_SOURCES _tests_list_length)    
     IF(_tests_list_length GREATER 0)        
         SET(__project_library "lib${name}")
+        
+        list(REMOVE_ITEM SOURCES ${MAIN_EXISTS})
     
         AddANHLibrary(${__project_library}
             DEPENDS
