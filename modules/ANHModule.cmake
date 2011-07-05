@@ -5,7 +5,7 @@
 #
 # Function Definition:
 #
-# AddANHSHAREDLIBrary(library_name
+# AddANHModule(library_name
 #     DEPENDS [ARGS] [args1...]           	     # Dependencies on other MMOServer projects
 #     ADDITIONAL_INCLUDE_DIRS [ARGS] [args1...]  # Additional directories to search for includes
 #     ADDITIONAL_SOURCE_DIRS [ARGS] [args1...]   # Additional directories to search for files to include in the project
@@ -17,9 +17,9 @@
 # Simple Example Usage:
 ########################
 #
-# include(ANHSHAREDLIBrary)
+# include(ANHModule)
 # 
-# AddANHSHAREDLIBrary(Common
+# AddANHModule(Common
 #     MMOSERVER_DEPS 
 #         Utils 
 # )
@@ -28,9 +28,9 @@
 #########################
 # Complex Example Usage:
 #########################
-# include(ANHSHAREDLIBrary)
+# include(ANHModule)
 #
-# AddANHSHAREDLIBrary(ScriptEngine
+# AddANHModule(ScriptEngine
 #     DEPENDS 
 #         Utils
 #         Common
@@ -57,7 +57,7 @@
 
 INCLUDE(CMakeMacroParseArguments)
 
-FUNCTION(AddANHSharedLibrary name)
+FUNCTION(AddANHModule name)
     PARSE_ARGUMENTS(ANHSHAREDLIB "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
     
     LIST(LENGTH SOURCES __source_files_list_length)
@@ -107,17 +107,17 @@ FUNCTION(AddANHSharedLibrary name)
     ENDIF()
 	    
     # Create the Common library
-    ADD_LIBRARY(${name} SHARED ${SOURCES})    
+    ADD_LIBRARY(mod_${name} SHARED ${SOURCES})    
     
     IF(_project_deps_list_length GREATER 0)
-        ADD_DEPENDENCIES(${name} ${ANHSHAREDLIB_DEPENDS})
-		TARGET_LINK_LIBRARIES(${name} ${ANHSHAREDLIB_DEPENDS})
+        ADD_DEPENDENCIES(mod_${name} ${ANHSHAREDLIB_DEPENDS})
+		TARGET_LINK_LIBRARIES(mod_${name} ${ANHSHAREDLIB_DEPENDS})
     ENDIF()
     
     IF(_debug_list_length GREATER 0)
         FOREACH(debug_library ${ANHSHAREDLIB_DEBUG_LIBRARIES})
             if (NOT ${debug_library} MATCHES ".*NOTFOUND")
-                TARGET_LINK_LIBRARIES(${name} debug ${debug_library})                    
+                TARGET_LINK_LIBRARIES(mod_${name} debug ${debug_library})                    
             endif()
         ENDFOREACH()
     ENDIF()
@@ -125,7 +125,7 @@ FUNCTION(AddANHSharedLibrary name)
     IF(_optimized_list_length GREATER 0)
         FOREACH(optimized_library ${ANHSHAREDLIB_OPTIMIZED_LIBRARIES})
             if (NOT ${optimized_library} MATCHES ".*NOTFOUND")
-                TARGET_LINK_LIBRARIES(${name} optimized ${optimized_library})                    
+                TARGET_LINK_LIBRARIES(mod_${name} optimized ${optimized_library})                    
             endif()
         ENDFOREACH()
     ENDIF()
@@ -173,7 +173,7 @@ FUNCTION(AddANHSharedLibrary name)
             # Create a custom built user configuration so that the "run in debug mode"
             # works without any issues.
     	    CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../tools/windows/user_project.vcxproj.in 
-    	        ${CMAKE_CURRENT_BINARY_DIR}/${name}_tests.vcxproj.user @ONLY)   
+    	        ${CMAKE_CURRENT_BINARY_DIR}/mod_${name}_tests.vcxproj.user @ONLY)   
     	                     
     	    ## After each executable project is built make sure the environment is
     	    ## properly set up (scripts, default configs, etc exist).
@@ -193,10 +193,10 @@ FUNCTION(AddANHSharedLibrary name)
         # Mysql is built with the static runtime but all of our projects and deps
         # use the dynamic runtime, in this instance it's a non-issue so ignore
         # the problem lib.
-        SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
+        SET_TARGET_PROPERTIES(mod_${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
         
 		# set the default output directory for the shared library for convenience
-		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+		SET_TARGET_PROPERTIES(mod_${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
 		ADD_DEFINITIONS ( -DDLL_EXPORTS )
 	ENDIF()
         
