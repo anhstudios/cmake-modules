@@ -168,7 +168,8 @@ FUNCTION(AddANHLibrary name)
             # use the dynamic runtime, in this instance it's a non-issue so ignore
             # the problem lib.
             SET_TARGET_PROPERTIES(${name}_tests PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
-        
+            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES LINK_FLAGS_RELEASE "/NODEFAULTLIB:LIBCMT /LTCG")
+            
             # Create a custom built user configuration so that the "run in debug mode"
             # works without any issues.
     	    CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../tools/windows/user_project.vcxproj.in 
