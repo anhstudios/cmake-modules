@@ -142,6 +142,7 @@ FUNCTION(AddANHLibrary name)
                             
         IF(_project_deps_list_length GREATER 0)
             ADD_DEPENDENCIES(${name}_tests ${ANHLIB_DEPENDS})
+            ADD_DEPENDENCIES(${name}_tests DEPS)
         ENDIF()
     
         IF(_debug_list_length GREATER 0)
@@ -162,7 +163,9 @@ FUNCTION(AddANHLibrary name)
         
         IF(WIN32)
             # Set the default output directory for binaries for convenience.
-            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+            set(RUNTIME_OUTPUT_BASE_DIRECTORY "${PROJECT_BINARY_DIR}/../..")
+            
+            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
                
             # Mysql is built with the static runtime but all of our projects and deps
             # use the dynamic runtime, in this instance it's a non-issue so ignore
@@ -178,8 +181,8 @@ FUNCTION(AddANHLibrary name)
     	    # After each executable project is built make sure the environment is
     	    # properly set up (scripts, default configs, etc exist).
     	    ADD_CUSTOM_COMMAND(TARGET ${name}_tests POST_BUILD
-                COMMAND call \"${PROJECT_BINARY_DIR}/bin/\$\(ConfigurationName\)/${name}_tests\"
-                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bin/\$\(ConfigurationName\)
+                COMMAND call \"${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/\$\(ConfigurationName\)/${name}_tests\"
+                WORKING_DIRECTORY ${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/\$\(ConfigurationName\)
             ) 
         ENDIF()
         

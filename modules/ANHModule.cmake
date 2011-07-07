@@ -111,6 +111,7 @@ FUNCTION(AddANHModule name)
     
     IF(_project_deps_list_length GREATER 0)
         ADD_DEPENDENCIES(mod_${name} ${ANHSHAREDLIB_DEPENDS})
+        ADD_DEPENDENCIES(mod_${name} DEPS)
 		TARGET_LINK_LIBRARIES(mod_${name} ${ANHSHAREDLIB_DEPENDS})
     ENDIF()
     
@@ -190,13 +191,16 @@ FUNCTION(AddANHModule name)
     ENDIF()
 	
 	IF (WIN32)
+        # Set the default output directory for binaries for convenience.
+        set(RUNTIME_OUTPUT_BASE_DIRECTORY "${PROJECT_BINARY_DIR}/../..")
+            
         # Mysql is built with the static runtime but all of our projects and deps
         # use the dynamic runtime, in this instance it's a non-issue so ignore
         # the problem lib.
         SET_TARGET_PROPERTIES(mod_${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
         
 		# set the default output directory for the shared library for convenience
-		SET_TARGET_PROPERTIES(mod_${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+		SET_TARGET_PROPERTIES(mod_${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
 		ADD_DEFINITIONS ( -DDLL_EXPORTS )
 	ENDIF()
         
