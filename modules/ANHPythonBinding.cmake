@@ -60,7 +60,7 @@ INCLUDE(CMakeMacroParseArguments)
 FUNCTION(AddANHPythonBinding name)
     PARSE_ARGUMENTS(ANHPYTHONLIB "DEPENDS;SOURCES;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
     
-    LIST(LENGTH SOURCES __source_files_list_length)
+    LIST(LENGTH ANHPYTHONLIB_SOURCES __source_files_list_length)
     LIST(LENGTH ANHPYTHONLIB_DEBUG_LIBRARIES _debug_list_length)
     LIST(LENGTH ANHPYTHONLIB_OPTIMIZED_LIBRARIES _optimized_list_length)
     LIST(LENGTH ANHPYTHONLIB_DEPENDS _project_deps_list_length)
@@ -71,9 +71,9 @@ FUNCTION(AddANHPythonBinding name)
     # Grab all of the source files and all of the unit test files.
     IF(__source_files_list_length EQUAL 0)    
         # load up all of the source and header files for the project
-        FILE(GLOB_RECURSE SOURCES *.cc *.cpp *.h)
+        FILE(GLOB_RECURSE ANHPYTHONLIB_SOURCES *.cc *.cpp *.h)
         
-        FOREACH(__source_file ${SOURCES})
+        FOREACH(__source_file ${ANHPYTHONLIB_SOURCES})
             STRING(REGEX REPLACE "(${CMAKE_CURRENT_SOURCE_DIR}/)((.*/)*)(.*)" "\\2" __source_dir "${__source_file}")
             STRING(REGEX REPLACE "(${CMAKE_CURRENT_SOURCE_DIR}/${__source_dir})(.*)" "\\2" __source_filename "${__source_file}")
             
@@ -81,13 +81,13 @@ FUNCTION(AddANHPythonBinding name)
             SOURCE_GROUP("${__source_group}" FILES ${__source_file})
         ENDFOREACH()
     ELSE()
-        FOREACH(__source_file ${SOURCES})
+        FOREACH(__source_file ${ANHPYTHONLIB_SOURCES})
             STRING(REGEX REPLACE "(${CMAKE_CURRENT_SOURCE_DIR}/${__source_dir})(.*)" "\\2" __source_filename "${__source_file}")
         
             STRING(SUBSTRING ${__source_filename} 0 5 __main_check)
             STRING(COMPARE EQUAL "main." "${__main_check}" __is_main)
             IF(__is_main)
-                LIST(REMOVE_ITEM SOURCES ${__source_file})
+                LIST(REMOVE_ITEM ANHPYTHONLIB_SOURCES ${__source_file})
             ENDIF()    
         ENDFOREACH()
     ENDIF()
@@ -101,7 +101,7 @@ FUNCTION(AddANHPythonBinding name)
     ENDIF()
 	    
     # Create the Common library
-    ADD_LIBRARY(${name} SHARED ${SOURCES})    
+    ADD_LIBRARY(${name} SHARED ${ANHPYTHONLIB_SOURCES})    
     
     IF(_project_deps_list_length GREATER 0)
         ADD_DEPENDENCIES(${name} ${ANHPYTHONLIB_DEPENDS})
@@ -124,9 +124,13 @@ FUNCTION(AddANHPythonBinding name)
         ENDFOREACH()
     ENDIF()
         
-	IF(WIN32)
-		# Set the default output directory for binaries for convenience.
-		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+    IF(WIN32)
+        # Set the default output directory for binaries for convenience.
+        set(RUNTIME_OUTPUT_BASE_DIRECTORY "${PROJECT_BINARY_DIR}/../..")
+            
+        # Set the default output directory for binaries for convenience.
+        SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
+        
 		SET_TARGET_PROPERTIES( ${name} PROPERTIES SUFFIX ".pyd")
 		SET_TARGET_PROPERTIES( ${name} PROPERTIES DEBUG_POSTFIX "")
 								 

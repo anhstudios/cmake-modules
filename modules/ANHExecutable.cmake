@@ -54,6 +54,7 @@
 
 INCLUDE(CMakeMacroParseArguments)
 INCLUDE(ANHLibrary)
+INCLUDE(ANHPythonBinding)
 
 FUNCTION(AddANHExecutable name)
     PARSE_ARGUMENTS(ANHEXE "DEPENDS;SOURCES;TEST_SOURCES;ADDITIONAL_LIBRARY_DIRS;ADDITIONAL_INCLUDE_DIRS;ADDITIONAL_SOURCE_DIRS;DEBUG_LIBRARIES;OPTIMIZED_LIBRARIES" "" ${ARGN})
@@ -71,6 +72,7 @@ FUNCTION(AddANHExecutable name)
     FILE(GLOB_RECURSE SOURCES *.cc *.cpp *.h)   
     FILE(GLOB_RECURSE HEADERS *.h)
     FILE(GLOB_RECURSE TEST_SOURCES *_unittest.cc *_unittest.cpp mock_*.h)
+    FILE(GLOB_RECURSE BINDINGS *_binding.cc *_binding.cpp)
         
     FOREACH(__source_file ${SOURCES})
         STRING(REGEX REPLACE "(${CMAKE_CURRENT_SOURCE_DIR}/)((.*/)*)(.*)" "\\2" __source_dir "${__source_file}")
@@ -84,12 +86,31 @@ FUNCTION(AddANHExecutable name)
         STRING(COMPARE EQUAL "main." "${__main_check}" __is_main)
         IF(__is_main)
             SET(MAIN_EXISTS ${__source_file})
-        ENDIF()        
+        ENDIF()      
     ENDFOREACH()
     
+    # if python bindings have been specified generate a module
+    LIST(LENGTH BINDINGS _bindings_list_length)
+    IF(_bindings_list_length GREATER 0)
+        list(REMOVE_ITEM SOURCES ${BINDINGS})
+        
+        AddANHPythonBinding(${name}_binding
+            DEPENDS
+                ${ANHEXE_DEPENDS}
+            SOURCES
+                ${BINDINGS}
+            ADDITIONAL_INCLUDE_DIRS
+                ${ANHEXE_ADDITIONAL_INCLUDE_DIRS}
+            DEBUG_LIBRARIES
+                ${ANHEXE_DEBUG_LIBRARIES}
+            OPTIMIZED_LIBRARIES
+                ${ANHEXE_OPTIMIZED_LIBRARIES}
+        )
+    ENDIF()
+    
     # if unit tests have been specified break out the project into a library to make it testable
-    LIST(LENGTH TEST_SOURCES _tests_list_length)    
-    IF(_tests_list_length GREATER 0)        
+    LIST(LENGTH SOURCES _sources_list_length)    
+    IF(_sources_list_length GREATER 1)        
         SET(__project_library "lib${name}")
         
         list(REMOVE_ITEM SOURCES ${MAIN_EXISTS})
