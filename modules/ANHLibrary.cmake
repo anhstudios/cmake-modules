@@ -184,7 +184,7 @@ FUNCTION(AddANHLibrary name)
                 ADD_TEST(
                     NAME all_${name}_tests_${configuration}
                     CONFIGURATIONS ${configuration}
-                    COMMAND ${name}_tests "--gtest_output=xml:${PROJECT_BINARY_DIR}/reports/$<CONFIGURATION>"
+                    COMMAND ${name}_tests "--gtest_output=xml:${PROJECT_BINARY_DIR}/reports/$<CONFIGURATION>/"
                     WORKING_DIRECTORY ${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${configuration}
                 )
             endforeach()
