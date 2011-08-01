@@ -165,7 +165,7 @@ FUNCTION(AddANHLibrary name)
             # Set the default output directory for binaries for convenience.
             set(RUNTIME_OUTPUT_BASE_DIRECTORY "${PROJECT_BINARY_DIR}/../..")
             
-            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
+            SET_TARGET_PROPERTIES(${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin")
                
             # Mysql is built with the static runtime but all of our projects and deps
             # use the dynamic runtime, in this instance it's a non-issue so ignore
