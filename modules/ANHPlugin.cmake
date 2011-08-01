@@ -174,59 +174,6 @@ FUNCTION(AddANHPlugin name)
             endif()
         ENDFOREACH()
     ENDIF()
-
-	IF(_tests_list_length GREATER 0)
-        # Create an executable for the test and link it to gtest and anh
-        INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIR})
-        ADD_EXECUTABLE(${name}_tests ${TEST_SOURCES})
-        TARGET_LINK_LIBRARIES(${name}_tests 
-            ${name}
-            ${ANHPLUGIN_DEPENDS}
-            ${GTEST_BOTH_LIBRARIES}
-            ${GMOCK_LIBRARIES})
-        add_dependencies(mod_${name}_tests DEPS)
-                            
-        IF(_project_deps_list_length GREATER 0)
-            ADD_DEPENDENCIES(${name}_tests ${ANHPLUGIN_DEPENDS})
-        ENDIF()
-    
-        IF(_debug_list_length GREATER 0)
-            FOREACH(debug_library ${ANHPLUGIN_DEBUG_LIBRARIES})
-                if (NOT ${debug_library} MATCHES ".*NOTFOUND")
-                    TARGET_LINK_LIBRARIES(mod_${name}_tests debug ${debug_library})                    
-                endif()
-            ENDFOREACH()
-        ENDIF()
-    
-        IF(_optimized_list_length GREATER 0)
-            FOREACH(optimized_library ${ANHPLUGIN_OPTIMIZED_LIBRARIES})
-                if (NOT ${optimized_library} MATCHES ".*NOTFOUND")
-                    TARGET_LINK_LIBRARIES(mod_${name}_tests optimized ${optimized_library})                    
-                endif()
-            ENDFOREACH()
-        ENDIF()
-        
-        IF(WIN32)
-            # Set the default output directory for binaries for convenience.
-            SET_TARGET_PROPERTIES(mod_${name}_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
-                      
-            # Mysql is built with the static runtime but all of our projects and deps
-            # use the dynamic runtime, in this instance it's a non-issue so ignore
-            # the problem lib.
-            SET_TARGET_PROPERTIES(mod_${name}_tests PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
-        
-            # Create a custom built user configuration so that the "run in debug mode"
-            # works without any issues.
-    	    CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../tools/windows/user_project.vcxproj.in 
-    	        ${CMAKE_CURRENT_BINARY_DIR}/${name}_tests.vcxproj.user @ONLY)       	            
-        ENDIF()
-        
-        GTEST_ADD_TESTS(mod_${name}_tests "" ${TEST_SOURCES})
-      
-        IF(ENABLE_TEST_REPORT)
-            ADD_TEST(NAME all_${name}_tests COMMAND mod_${name}_tests "--gtest_output=xml:${PROJECT_BINARY_DIR}/$<CONFIGURATION>/")
-        ENDIF()
-    ENDIF()
 	
 	IF (WIN32)
         # Set the default output directory for binaries for convenience.
@@ -238,7 +185,7 @@ FUNCTION(AddANHPlugin name)
         SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
         
 		# set the default output directory for the shared library for convenience
-		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
+		SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin")
 		ADD_DEFINITIONS ( -DDLL_EXPORTS )
 	ENDIF()
         

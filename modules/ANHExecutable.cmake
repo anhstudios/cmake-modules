@@ -179,7 +179,7 @@ FUNCTION(AddANHExecutable name)
         set(RUNTIME_OUTPUT_BASE_DIRECTORY "${PROJECT_BINARY_DIR}/../..")
             
         # Set the default output directory for binaries for convenience.
-        SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${CMAKE_BUILD_TYPE}")
+        SET_TARGET_PROPERTIES(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin")
         
         # Mysql is built with the static runtime but all of our projects and deps
         # use the dynamic runtime, in this instance it's a non-issue so ignore

@@ -182,7 +182,7 @@ FUNCTION(AddANHLibrary name)
         GTEST_ADD_TESTS(${name}_tests "" ${TEST_SOURCES})
       
         IF(ENABLE_TEST_REPORT)
-            ADD_TEST(NAME all_${name}_tests COMMAND ${name}_tests "--gtest_output=xml:${PROJECT_BINARY_DIR}/$<CONFIGURATION>/")
+            ADD_TEST(NAME all_${name}_tests COMMAND ${name}_tests "--gtest_output=xml:${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/$<CONFIGURATION>/")
         ENDIF()
     ENDIF()
 ENDFUNCTION()
