@@ -179,10 +179,15 @@ FUNCTION(AddANHLibrary name)
     	        ${CMAKE_CURRENT_BINARY_DIR}/${name}_tests.vcxproj.user @ONLY)
         ENDIF()
         
-        GTEST_ADD_TESTS(${name}_tests "" ${TEST_SOURCES})
-      
         IF(ENABLE_TEST_REPORT)
-            ADD_TEST(NAME all_${name}_tests COMMAND ${name}_tests "--gtest_output=xml:${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/$<CONFIGURATION>/")
+            foreach(configuration Debug Release MinSizeRel RelWithDebInfo)
+                ADD_TEST(
+                    NAME all_${name}_tests_${configuration}
+                    CONFIGURATIONS ${configuration}
+                    COMMAND ${name}_tests "--gtest_output=xml:${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/reports/$<CONFIGURATION>/"
+                    WORKING_DIRECTORY ${RUNTIME_OUTPUT_BASE_DIRECTORY}/bin/${configuration}
+                )
+            endforeach()
         ENDIF()
     ENDIF()
 ENDFUNCTION()
